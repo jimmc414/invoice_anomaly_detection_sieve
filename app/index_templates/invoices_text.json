@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "index": { "number_of_shards": 1, "number_of_replicas": 0 },
+    "analysis": {
+      "analyzer": {
+        "char_3gram": {
+          "type": "custom",
+          "tokenizer": "ngram",
+          "filter": ["lowercase"]
+        }
+      },
+      "tokenizer": { "ngram": { "type": "nGram", "min_gram": 3, "max_gram": 3 } }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "tenant_id": { "type": "keyword" },
+      "vendor_id": { "type": "keyword" },
+      "invoice_id": { "type": "keyword" },
+      "text_blob": { "type": "text", "analyzer": "char_3gram" }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-1001-A",
+  "vendor_id": "V001",
+  "vendor_name": "Acme Supplies",
+  "invoice_number": "INV-1001",
+  "invoice_date": "2025-06-15",
+  "currency": "USD",
+  "total": 1280.0,
+  "tax_total": 80.0,
+  "po_number": "PO-7788",
+  "remit_bank_iban_or_account": "US12 3456 7890 1234",
+  "remit_name": "Acme Holdings",
+  "pdf_hash": "3c9f4b",
+  "terms": "Net 30",
+  "line_items": [
+    {"desc": "Paper A4 500 sheets", "qty": 10, "unit_price": 10.0, "amount": 100.0, "sku": "PAPR-A4"},
+    {"desc": "Printer Ink Black", "qty": 20, "unit_price": 20.0, "amount": 400.0, "sku": "INK-BLK"},
+    {"desc": "Printer Ink Color", "qty": 16, "unit_price": 30.0, "amount": 480.0, "sku": "INK-CLR"},
+    {"desc": "Shipping", "qty": 1, "unit_price": 300.0, "amount": 300.0}
+  ]
+}
