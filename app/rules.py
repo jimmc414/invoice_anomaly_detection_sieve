@@ -1,6 +1,8 @@
 """Deterministic duplicate and anomaly rules."""
 from __future__ import annotations
 
+from decimal import Decimal
+
 HOLD = "HOLD"
 REVIEW = "REVIEW"
 PASS = "PASS"
@@ -13,15 +15,19 @@ def rule_same_invnum_norm(invnum_a: str, invnum_b: str) -> bool:
 def rule_same_po_near_total(
     po_a: str | None,
     po_b: str | None,
-    total_a: float,
-    total_b: float,
+    total_a: float | int | Decimal,
+    total_b: float | int | Decimal,
     date_gap_days: int,
     pct_tol: float = 0.005,
     window: int = 30,
 ) -> bool:
     if not po_a or not po_b or po_a != po_b:
         return False
-    if abs(total_a - total_b) > pct_tol * max(abs(total_a), 1.0):
+    total_a_num = float(total_a) if total_a is not None else 0.0
+    total_b_num = float(total_b) if total_b is not None else 0.0
+    pct_tol_num = float(pct_tol)
+    tolerance_base = max(abs(total_a_num), 1.0)
+    if abs(total_a_num - total_b_num) > pct_tol_num * tolerance_base:
         return False
     return date_gap_days <= window
 
