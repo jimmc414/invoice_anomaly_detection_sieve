@@ -8,11 +8,20 @@ from rapidfuzz.distance import JaroWinkler
 from scipy.optimize import linear_sum_assignment
 
 
+def _to_float(value: Any, default: float = 0.0) -> float:
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def header_features(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, float]:
     features: Dict[str, float] = {}
-    features["abs_total_diff_pct"] = abs(a.get("total", 0.0) - b.get("total", 0.0)) / max(
-        abs(a.get("total", 0.0)), 1.0
-    )
+    total_a = _to_float(a.get("total"))
+    total_b = _to_float(b.get("total"))
+    features["abs_total_diff_pct"] = float(abs(total_a - total_b) / max(abs(total_a), 1.0))
     features["days_diff"] = float(abs((a.get("invoice_date") - b.get("invoice_date")).days))
     features["same_po"] = float(1.0 if a.get("po_number") and a.get("po_number") == b.get("po_number") else 0.0)
     features["same_currency"] = float(1.0 if a.get("currency") == b.get("currency") else 0.0)
@@ -43,13 +52,16 @@ def line_assign_features(
     gamma: float = 0.1,
 ) -> Dict[str, float]:
     if not a_lines or not b_lines:
-        total_amount = sum(x.get("amount", 0.0) for x in a_lines)
+        total_amount = sum((_to_float(x.get("amount")) for x in a_lines), 0.0)
         unmatched = float(total_amount)
+        unmatched_amount_frac = (
+            float(unmatched / max(total_amount, 1.0)) if total_amount else 1.0
+        )
         return {
             "line_coverage_pct": 0.0,
-            "unmatched_amount_frac": float(unmatched / max(total_amount, 1.0)) if total_amount else 1.0,
+            "unmatched_amount_frac": unmatched_amount_frac,
             "count_new_items": float(len(a_lines)),
-            "median_unit_price_diff": float(total_amount),
+            "median_unit_price_diff": unmatched,
         }
 
     n, m = len(a_lines), len(b_lines)
