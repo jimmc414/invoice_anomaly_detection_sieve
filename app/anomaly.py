@@ -69,14 +69,18 @@ def anomaly_score(invoice_row: Dict[str, Any], vendor_hist_count: int | None = N
         if bank_change:
             reasons.append("BANK_CHANGE")
 
+    invoice_total = float(invoice_row.get("total") or 0.0)
+    baseline_mean = float(baseline.get("mean_total") or 0.0) if baseline else 0.0
+    baseline_std = float(baseline.get("std_total") or 0.0) if baseline else 0.0
+    sample_count = int(baseline.get("sample_count") or 0) if baseline else 0
+
     amount_z = 0.0
-    if baseline and baseline.get("std_total") and baseline.get("std_total") > 0:
-        amount_z = abs(invoice_row.get("total", 0.0) - baseline.get("mean_total", 0.0)) / baseline["std_total"]
-    elif baseline and baseline.get("sample_count", 0) > 10:
+    if baseline and baseline_std > 0.0:
+        amount_z = abs(invoice_total - baseline_mean) / baseline_std
+    elif baseline and sample_count > 10:
         # fallback using MAD-like heuristic
-        amount_z = abs(invoice_row.get("total", 0.0) - baseline.get("mean_total", 0.0)) / max(
-            abs(baseline.get("mean_total", 0.0)), 1.0
-        )
+        scale = max(abs(baseline_mean), 1.0)
+        amount_z = abs(invoice_total - baseline_mean) / scale
 
     if amount_z >= 2.5:
         reasons.append("UNIT_PRICE_OUTLIER")
