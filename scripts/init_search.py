@@ -13,7 +13,8 @@ def main() -> None:
     index_name = "invoice_text"
     if client.indices.exists(index_name):
         client.indices.delete(index_name)
-    template = json.load(open("app/index_templates/invoices_text.json", "r", encoding="utf8"))
+    with open("app/index_templates/invoices_text.json", "r", encoding="utf8") as f:
+        template = json.load(f)
     client.indices.create(index=index_name, body=template)
     print("OpenSearch index ready.")
 

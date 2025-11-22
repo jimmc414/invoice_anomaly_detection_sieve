@@ -5,7 +5,7 @@ from functools import lru_cache
 from typing import Any
 import os
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class Settings(BaseModel):
@@ -36,7 +36,8 @@ class Settings(BaseModel):
     class Config:
         frozen = True
 
-    @validator("hold_threshold_default", "review_threshold_default")
+    @field_validator("hold_threshold_default", "review_threshold_default")
+    @classmethod
     def _validate_threshold(cls, value: float) -> float:  # noqa: D401
         """Ensure thresholds are within the 0-100 risk score range."""
 

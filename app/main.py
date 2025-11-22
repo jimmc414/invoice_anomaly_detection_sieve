@@ -70,7 +70,8 @@ def _persist_invoice(invoice: Dict[str, Any]) -> Dict[str, Any]:
     payload["remit_account_hash"] = hash_account(payload.get("remit_bank_iban_or_account"))
     payload_hash = invoice_payload_hash(payload)
 
-    with SessionLocal().begin() as session:
+    session = SessionLocal()
+    with session.begin():
         session.execute(
             text(
                 """
@@ -251,7 +252,8 @@ def _persist_decision(invoice_id: str, score: float, decision: str, reasons: Lis
         .bindparams(bindparam("reason_codes", type_=ARRAY(String())))
     )
 
-    with SessionLocal().begin() as session:
+    session = SessionLocal()
+    with session.begin():
         session.execute(
             stmt,
             {

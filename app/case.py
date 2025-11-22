@@ -19,7 +19,8 @@ def create_or_update_case(invoice_id: str, decision: str) -> str | None:
     if decision not in CASE_OPEN_DECISIONS:
         return None
 
-    with SessionLocal().begin() as session:
+    session = SessionLocal()
+    with session.begin():
         existing = session.execute(
             text(
                 """

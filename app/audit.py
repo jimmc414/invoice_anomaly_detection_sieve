@@ -13,7 +13,8 @@ from app.storage import SessionLocal
 def log_action(actor: str, action: str, entity: str, entity_id: str, payload: Dict[str, Any] | None = None) -> None:
     """Persist an audit log entry."""
 
-    with SessionLocal().begin() as session:
+    session = SessionLocal()
+    with session.begin():
         session.execute(
             text(
                 """
